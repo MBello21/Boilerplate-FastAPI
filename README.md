@@ -164,4 +164,4 @@ pipenv run start    # Arranca el servidor en modo desarrollo
 ## Autor
 
 **Miguel Ángel García Bello**  
-COEX CA-03 · Demarcación de Carreteras del Estado en Cádiz
+
