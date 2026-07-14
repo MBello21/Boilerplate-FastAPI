@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+start = "uvicorn src.app:app --reload --host 0.0.0.0 --port 3001"
+
+[packages]
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+psycopg2-binary = "*"
+python-dotenv = "*"
+sqlalchemy = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+pydantic = "*"
+email-validator = "*"
+dotenv = "*"
+bcrypt = "==4.0.1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.14"
