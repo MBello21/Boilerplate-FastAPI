@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.router_global import api_router
+from src.database import Base, engine
 
 app = FastAPI(
     title='Api modular FastAPI',
@@ -19,6 +20,4 @@ app.add_middleware(
 
 app.include_router(api_router, prefix="/api/v1")
 
-
-db_url = os.getenv("DATABASE_URL", "sqlite:////./test.db")
-db_url = db_url.replace("postgres://", "postgresql://")
+Base.metadata.create_all(bind=engine)

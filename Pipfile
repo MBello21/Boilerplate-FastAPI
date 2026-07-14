@@ -12,6 +12,12 @@ uvicorn = {extras = ["standard"], version = "*"}
 psycopg2-binary = "*"
 python-dotenv = "*"
 sqlalchemy = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+pydantic = "*"
+email-validator = "*"
+dotenv = "*"
+bcrypt = "==4.0.1"
 
 [dev-packages]
 
