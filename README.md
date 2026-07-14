@@ -92,10 +92,10 @@ Boilerplate-FastAPI/
 ## Variables de entorno
 
 ```env
-POSTGRES_USER=MGB
-POSTGRES_DB=FastAPI
+POSTGRES_USER=usuario
+POSTGRES_DB=example
 POSTGRES_PASSWORD=tu_password_seguro
-DATABASE_URL=postgresql://MGB:tu_password_seguro@localhost:5432/FastAPI
+DATABASE_URL=postgresql://usuario:tu_password_seguro@localhost:5432/example
 ```
 
 ---
