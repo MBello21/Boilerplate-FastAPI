@@ -1,167 +1,107 @@
-# ⚡ Boilerplate FastAPI
+# ConstruCloudAI API
 
-Punto de partida para APIs REST con **FastAPI**, **PostgreSQL** y **SQLAlchemy 2.0**.  
-Incluye DevContainers, validación con Pydantic, hashing con bcrypt y documentación Swagger automática.
-
----
+Backend de ConstruCloudAI — plataforma de generación de presupuestos de construcción asistidos por IA.
 
 ## Stack
 
-| Capa | Tecnología |
-|------|-----------|
-| Framework | FastAPI |
-| ORM | SQLAlchemy 2.0 (mapped_column) |
-| Validación | Pydantic v2 |
-| Base de datos | PostgreSQL 17 |
-| Hashing | bcrypt |
-| Servidor | uvicorn |
-| Entorno | Pipenv + DevContainers |
-| Contenedores | Docker Compose |
-
----
+- **Runtime:** Python 3.12+
+- **Framework:** FastAPI
+- **ORM:** SQLAlchemy 2.0 + Alembic (migraciones)
+- **Base de datos:** PostgreSQL 16
+- **Autenticación:** JWT (access + refresh tokens)
+- **IA:** Integración con LLM para sugerencia de partidas y estimaciones
+- **Storage:** MinIO (fase posterior al MVP)
+- **Containerización:** Docker + Docker Compose
 
 ## Estructura del proyecto
 
 ```
-Boilerplate-FastAPI/
-├── .devcontainer/
-│   ├── devcontainer.json
-│   ├── dockerfile
-│   └── docker-compose.yml
-├── src/
-│   ├── app.py                  # Punto de entrada FastAPI
-│   ├── database.py             # Engine, SessionLocal, Base, get_db
-│   └── api/
-│       ├── __init__.py          # Registro de modelos
-│       ├── router_global.py     # Router principal
-│       └── users/
-│           ├── __init__.py
-│           ├── models.py        # Modelo SQLAlchemy
-│           ├── schemas.py       # Schemas Pydantic
-│           └── routes.py        # Endpoints CRUD
-├── .env
+construcloudai-api/
+├── app/
+│   ├── __init__.py
+│   ├── main.py                 # Entry point FastAPI
+│   ├── config.py               # Settings (Pydantic BaseSettings)
+│   ├── database.py             # Engine, SessionLocal, Base
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── usuario.py
+│   │   ├── cliente.py
+│   │   ├── presupuesto.py
+│   │   ├── detalle.py
+│   │   └── tarifa_base.py
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   ├── usuario.py
+│   │   ├── cliente.py
+│   │   ├── presupuesto.py
+│   │   ├── detalle.py
+│   │   └── tarifa_base.py
+│   ├── routers/
+│   │   ├── __init__.py
+│   │   ├── auth.py
+│   │   ├── usuarios.py
+│   │   ├── clientes.py
+│   │   ├── presupuestos.py
+│   │   ├── detalles.py
+│   │   ├── tarifas.py
+│   │   └── ia.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── auth_service.py
+│   │   ├── presupuesto_service.py
+│   │   ├── ia_service.py
+│   │   └── pdf_service.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── security.py         # JWT, hashing
+│   │   └── dependencies.py     # get_db, get_current_user
+│   └── utils/
+│       ├── __init__.py
+│       └── exceptions.py
+├── alembic/
+│   ├── env.py
+│   └── versions/
+├── tests/
+│   └── __init__.py
+├── alembic.ini
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
 ├── .env.example
-├── Pipfile
-├── Pipfile.lock
+├── .gitignore
 └── README.md
 ```
 
----
-
-## Inicio rápido
-
-### 1. Con DevContainers (recomendado)
-
-1. Copia el archivo de entorno:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Abre el proyecto en VS Code y selecciona **"Reopen in Container"**.
-
-3. Dentro del contenedor:
-   ```bash
-   pipenv install
-   pipenv run start
-   ```
-
-4. Abre `http://localhost:3001/docs` para ver Swagger.
-
-### 2. Sin DevContainers
-
-1. Copia el archivo de entorno:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Instala dependencias:
-   ```bash
-   pip install pipenv
-   pipenv install
-   ```
-
-3. Levanta PostgreSQL (con Docker o local) y configura la `DATABASE_URL` en `.env`.
-
-4. Arranca:
-   ```bash
-   pipenv run start
-   ```
-
----
-
-## Variables de entorno
-
-```env
-POSTGRES_USER=usuario
-POSTGRES_DB=example
-POSTGRES_PASSWORD=tu_password_seguro
-DATABASE_URL=postgresql://usuario:tu_password_seguro@localhost:5432/example
-```
-
----
-
-## Endpoints incluidos
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| `POST` | `/api/v1/users/` | Crear usuario |
-| `GET` | `/api/v1/users/` | Listar usuarios |
-| `GET` | `/api/v1/users/{id}` | Obtener usuario por ID |
-
-Documentación interactiva disponible en:
-- **Swagger UI** → `http://localhost:3001/docs`
-- **ReDoc** → `http://localhost:3001/redoc`
-
----
-
-## Cómo añadir un nuevo módulo
-
-1. Crea la carpeta `src/api/tu_modulo/` con:
-   - `__init__.py`
-   - `models.py` — Modelo SQLAlchemy
-   - `schemas.py` — Schemas Pydantic (Create, Response, Update)
-   - `routes.py` — Endpoints con APIRouter
-
-2. Registra el modelo en `src/api/__init__.py`:
-   ```python
-   from src.api.tu_modulo.models import TuModelo
-   ```
-
-3. Añade el router en `src/api/router_global.py`:
-   ```python
-   from src.api.tu_modulo.routes import router as tu_modulo_router
-   api_router.include_router(tu_modulo_router, prefix="/tu_modulo", tags=["TuModulo"])
-   ```
-
-4. Reinicia uvicorn y el nuevo módulo aparece en `/docs`.
-
----
-
-## Scripts disponibles
-
-```toml
-# Pipfile
-[scripts]
-start = "uvicorn src.app:app --reload --host 0.0.0.0 --port 3001"
-```
+## Setup local
 
 ```bash
-pipenv run start    # Arranca el servidor en modo desarrollo
+# Clonar
+git clone git@github.com:tu-usuario/construcloudai-api.git
+cd construcloudai-api
+
+# Entorno virtual
+python -m venv venv
+source venv/bin/activate
+
+# Dependencias
+pip install -r requirements.txt
+
+# Variables de entorno
+cp .env.example .env
+# Editar .env con tus credenciales
+
+# Base de datos
+docker compose up -d db
+alembic upgrade head
+
+# Servidor de desarrollo
+uvicorn app.main:app --reload --port 8000
 ```
 
----
+## Deploy
 
-## Próximos pasos
+Desplegado en Proxmox (homelab) con Docker Compose.
 
-- [ ] Configurar Alembic para migraciones
-- [ ] Añadir autenticación JWT con `python-jose`
-- [ ] Implementar endpoint de login
-- [ ] Proteger rutas con `Depends(get_current_user)`
-- [ ] Dockerizar para producción
+## Licencia
 
----
-
-## Autor
-
-**Miguel Ángel García Bello**  
-
+Proyecto privado — Labs by 4Geeks Academy (Jul–Ago 2026).
